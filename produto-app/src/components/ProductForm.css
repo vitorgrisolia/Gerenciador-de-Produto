@@ -1,0 +1,78 @@
+.product-form-container {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.product-form-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+
+.product-form .form-group {
+    margin-bottom: 15px;
+}
+
+.product-form .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: bold;
+}
+
+.product-form .form-group input[type="text"],
+.product-form .form-group input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+.product-form button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.product-form button[type="submit"] {
+    background-color: #4CAF50; 
+    color: white;
+}
+
+.product-form button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.product-form .cancel-button {
+    background-color: #f44336; 
+    color: white;
+}
+
+.product-form .cancel-button:hover {
+    background-color: #da190b;
+}
+.product-form .error-message {
+    color: #f44336;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+@media (max-width: 600px) {
+    .product-form-container {
+        padding: 15px;
+        margin: 15px;
+    }
+}
