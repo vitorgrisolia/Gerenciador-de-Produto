@@ -54,3 +54,70 @@ yarn install
 npm run start:dev
 # ou
 yarn start:dev
+```
+
+> O backend rodará em `http://localhost:3000`. Certifique-se de que o CORS está habilitado:
+```ts
+// main.ts
+app.enableCors();
+```
+
+---
+
+### 2. Frontend (React)
+
+```bash
+# Clone o repositório ou navegue até a pasta frontend/
+cd seu-projeto-react
+
+# Instale as dependências
+npm install
+# ou
+yarn install
+
+# Inicie a aplicação
+npm start
+```
+
+> O React abrirá em `http://localhost:3000` ou `http://localhost:3001`, dependendo da porta disponível.
+
+---
+
+## 🧩 Estrutura do Projeto (Frontend)
+
+```
+produto-app/
+├── public/
+├── src/
+│   ├── App.css              # Estilos globais
+│   ├── App.js               # Componente principal
+│   ├── index.css            # Reset e base CSS
+│   ├── index.js             # Ponto de entrada
+│   ├── components/
+│   │   ├── ProductForm.css
+│   │   ├── ProductForm.js
+│   │   ├── ProductList.css
+│   │   ├── ProductList.js
+│   │   ├── ProductItem.css
+│   │   └── ProductItem.js
+│   └── ...
+└── package.json
+```
+
+---
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas!  
+Sinta-se à vontade para abrir **issues** ou enviar um **pull request** com melhorias, correções ou sugestões.
+
+---
+
+## 📄 Licença
+
+Este projeto está licenciado sob a **MIT License** – veja o arquivo [LICENSE](LICENSE) para mais detalhes.  
+(Sinta-se livre para modificar a licença conforme necessário.)
+
+---
+
+> Desenvolvido com 💙 usando React e NestJS.
