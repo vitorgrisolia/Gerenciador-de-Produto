@@ -4,8 +4,21 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { configureApp } from './../src/app.setup';
 
+type ProductResponseBody = {
+  id: string;
+  name: string;
+  price: number;
+  sku: string;
+  missingLetter: string;
+};
+
+type ValidationErrorBody = {
+  message: string[];
+};
+
 describe('Products API (e2e)', () => {
   let app: INestApplication;
+  let httpServer: Parameters<typeof request>[0];
   const originalEnv = {
     DATABASE_PATH: process.env.DATABASE_PATH,
     DB_SYNCHRONIZE: process.env.DB_SYNCHRONIZE,
@@ -24,6 +37,7 @@ describe('Products API (e2e)', () => {
     app = moduleFixture.createNestApplication();
     configureApp(app);
     await app.init();
+    httpServer = app.getHttpServer() as Parameters<typeof request>[0];
   });
 
   afterAll(async () => {
@@ -35,7 +49,7 @@ describe('Products API (e2e)', () => {
   });
 
   it('creates, lists, updates and deletes a product', async () => {
-    const createResponse = await request(app.getHttpServer())
+    const createResponse = await request(httpServer)
       .post('/products')
       .send({
         name: 'Camiseta Azul',
@@ -44,21 +58,22 @@ describe('Products API (e2e)', () => {
       })
       .expect(201);
 
-    expect(createResponse.body).toMatchObject({
+    const createBody = createResponse.body as ProductResponseBody;
+
+    expect(createBody).toMatchObject({
       name: 'Camiseta Azul',
       price: 49.9,
       sku: 'CAM',
       missingLetter: 'b',
     });
-    expect(createResponse.body.id).toEqual(expect.any(String));
+    expect(createBody.id).toEqual(expect.any(String));
 
-    const productId = createResponse.body.id;
+    const productId = createBody.id;
 
-    const listResponse = await request(app.getHttpServer())
-      .get('/products')
-      .expect(200);
+    const listResponse = await request(httpServer).get('/products').expect(200);
+    const listBody = listResponse.body as ProductResponseBody[];
 
-    expect(listResponse.body).toEqual([
+    expect(listBody).toEqual([
       expect.objectContaining({
         id: productId,
         name: 'Camiseta Azul',
@@ -67,24 +82,24 @@ describe('Products API (e2e)', () => {
       }),
     ]);
 
-    await request(app.getHttpServer())
+    const updateResponse = await request(httpServer)
       .put(`/products/${productId}`)
       .send({
         name: 'Bermuda Preta',
         price: 79.9,
         sku: 'BER',
       })
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          id: productId,
-          name: 'Bermuda Preta',
-          sku: 'BER',
-          missingLetter: 'c',
-        });
-      });
+      .expect(200);
+    const updateBody = updateResponse.body as ProductResponseBody;
 
-    await request(app.getHttpServer())
+    expect(updateBody).toMatchObject({
+      id: productId,
+      name: 'Bermuda Preta',
+      sku: 'BER',
+      missingLetter: 'c',
+    });
+
+    await request(httpServer)
       .delete(`/products/${productId}`)
       .expect(200)
       .expect({
@@ -93,7 +108,7 @@ describe('Products API (e2e)', () => {
   });
 
   it('rejects invalid payloads and duplicate SKUs', async () => {
-    await request(app.getHttpServer())
+    await request(httpServer)
       .post('/products')
       .send({
         name: 'Tênis',
@@ -102,7 +117,7 @@ describe('Products API (e2e)', () => {
       })
       .expect(201);
 
-    await request(app.getHttpServer())
+    await request(httpServer)
       .post('/products')
       .send({
         name: 'Tênis Reserva',
@@ -111,18 +126,18 @@ describe('Products API (e2e)', () => {
       })
       .expect(409);
 
-    await request(app.getHttpServer())
+    const invalidResponse = await request(httpServer)
       .post('/products')
       .send({
         name: 'Produto inválido',
         price: 10,
         sku: '12',
       })
-      .expect(400)
-      .expect(({ body }) => {
-        expect(body.message).toContain(
-          'O SKU deve conter exatamente 3 caracteres.',
-        );
-      });
+      .expect(400);
+    const invalidBody = invalidResponse.body as ValidationErrorBody;
+
+    expect(invalidBody.message).toContain(
+      'O SKU deve conter exatamente 3 caracteres.',
+    );
   });
 });

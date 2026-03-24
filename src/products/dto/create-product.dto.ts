@@ -8,10 +8,18 @@ import {
   Matches,
 } from 'class-validator';
 
+function trimString(value: unknown): unknown {
+  return typeof value === 'string' ? value.trim() : value;
+}
+
+function normalizeSku(value: unknown): unknown {
+  return typeof value === 'string' ? value.trim().toUpperCase() : value;
+}
+
 export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }) => trimString(value))
   name: string;
 
   @Type(() => Number)
@@ -28,8 +36,6 @@ export class CreateProductDto {
   @Matches(/^[A-Z]{3}$/, {
     message: 'O SKU deve conter exatamente 3 letras.',
   })
-  @Transform(({ value }) =>
-    typeof value === 'string' ? value.trim().toUpperCase() : value,
-  )
+  @Transform(({ value }) => normalizeSku(value))
   sku: string;
 }

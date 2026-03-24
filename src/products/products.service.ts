@@ -14,6 +14,10 @@ type ProductResponse = Product & {
   missingLetter: string;
 };
 
+type SqliteConstraintError = {
+  code?: string;
+};
+
 @Injectable()
 export class ProductsService {
   constructor(
@@ -45,12 +49,18 @@ export class ProductsService {
   }
 
   private handlePersistenceError(error: unknown, sku: string): never {
-    if (
-      error instanceof QueryFailedError &&
-      typeof error.driverError?.code === 'string' &&
-      error.driverError.code.includes('SQLITE_CONSTRAINT')
-    ) {
-      throw new ConflictException(`Já existe um produto com SKU "${sku}".`);
+    if (error instanceof QueryFailedError) {
+      const queryError = error as QueryFailedError & {
+        driverError?: SqliteConstraintError;
+      };
+      const constraintCode = queryError.driverError?.code;
+
+      if (
+        typeof constraintCode === 'string' &&
+        constraintCode.includes('SQLITE_CONSTRAINT')
+      ) {
+        throw new ConflictException(`Já existe um produto com SKU "${sku}".`);
+      }
     }
 
     throw error;

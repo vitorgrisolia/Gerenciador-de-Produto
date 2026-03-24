@@ -8,4 +8,4 @@ async function bootstrap() {
   configureApp(app);
   await app.listen(getPort());
 }
-bootstrap();
+void bootstrap();
