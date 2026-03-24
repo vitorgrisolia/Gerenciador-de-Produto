@@ -64,7 +64,11 @@ describe('ProductsController', () => {
       sku: 'BER',
     };
 
-    productsService.update.mockResolvedValue({ id, ...dto, missingLetter: 'a' });
+    productsService.update.mockResolvedValue({
+      id,
+      ...dto,
+      missingLetter: 'a',
+    });
 
     await controller.update(id, dto);
 

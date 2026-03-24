@@ -80,7 +80,7 @@ describe('Products API (e2e)', () => {
           id: productId,
           name: 'Bermuda Preta',
           sku: 'BER',
-          missingLetter: 'a',
+          missingLetter: 'c',
         });
       });
 
@@ -120,7 +120,9 @@ describe('Products API (e2e)', () => {
       })
       .expect(400)
       .expect(({ body }) => {
-        expect(body.message).toContain('O SKU deve conter exatamente 3 caracteres.');
+        expect(body.message).toContain(
+          'O SKU deve conter exatamente 3 caracteres.',
+        );
       });
   });
 });

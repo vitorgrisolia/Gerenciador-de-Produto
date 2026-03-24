@@ -11,9 +11,7 @@ import {
 export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) =>
-    typeof value === 'string' ? value.trim() : value,
-  )
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   name: string;
 
   @Type(() => Number)

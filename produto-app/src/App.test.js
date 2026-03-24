@@ -30,7 +30,10 @@ describe('App', () => {
     expect(screen.getByText(/carregando produtos/i)).toBeInTheDocument();
     expect(await screen.findByText('Camiseta Azul')).toBeInTheDocument();
     expect(screen.getByText(/letra ausente do nome/i)).toHaveTextContent('b');
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/products');
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:3000/products',
+      {},
+    );
   });
 
   test('envia um novo produto com o SKU normalizado', async () => {
@@ -50,16 +53,14 @@ describe('App', () => {
         }),
       });
 
-    const user = userEvent.setup();
-
     render(<App />);
 
     await screen.findByText(/nenhum produto cadastrado ainda/i);
 
-    await user.type(screen.getByLabelText(/nome/i), 'Bermuda Preta');
-    await user.type(screen.getByLabelText(/preço/i), '79.90');
-    await user.type(screen.getByLabelText(/sku/i), 'ber');
-    await user.click(screen.getByRole('button', { name: /adicionar produto/i }));
+    await userEvent.type(screen.getByLabelText(/nome/i), 'Bermuda Preta');
+    await userEvent.type(screen.getByLabelText(/preço/i), '79.90');
+    await userEvent.type(screen.getByLabelText(/sku/i), 'ber');
+    await userEvent.click(screen.getByRole('button', { name: /adicionar produto/i }));
 
     expect(global.fetch).toHaveBeenNthCalledWith(
       2,

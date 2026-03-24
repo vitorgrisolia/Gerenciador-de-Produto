@@ -4,14 +4,14 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
 @Unique(['sku']) // SKU único no banco de dados
 export class Product {
   @PrimaryGeneratedColumn('uuid') // ID único
-    id: string;
+  id: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column({ type: 'float' })
-    price: number;
+  @Column({ type: 'float' })
+  price: number;
 
-    @Column()
-    sku: string;
+  @Column()
+  sku: string;
 }

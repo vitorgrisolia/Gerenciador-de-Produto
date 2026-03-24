@@ -125,18 +125,19 @@ describe('ProductsService', () => {
     });
     expect(result).toEqual({
       ...updatedProduct,
-      missingLetter: 'a',
+      missingLetter: 'c',
     });
   });
 
   it('translates SQLite unique errors into conflict exceptions', async () => {
     const product = buildProduct();
+    const driverError = Object.assign(new Error('constraint failed'), {
+      code: 'SQLITE_CONSTRAINT_UNIQUE',
+    });
 
     repository.create.mockReturnValue(product);
     repository.save.mockRejectedValue(
-      new QueryFailedError('INSERT INTO products', [], {
-        code: 'SQLITE_CONSTRAINT_UNIQUE',
-      }),
+      new QueryFailedError('INSERT INTO products', [], driverError),
     );
 
     await expect(
