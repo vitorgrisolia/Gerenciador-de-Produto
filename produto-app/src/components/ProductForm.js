@@ -75,7 +75,18 @@ function ProductForm({ addProduct, updateProduct, productToEdit, onCancel }) {
 
   return (
     <div className="product-form-container">
-      <h2>{productToEdit ? 'Editar Produto' : 'Adicionar Novo Produto'}</h2>
+      <div className="product-form-heading">
+        <p className="product-form-kicker">
+          {productToEdit ? 'Modo de edição' : 'Novo cadastro'}
+        </p>
+        <h2>{productToEdit ? 'Atualize um produto' : 'Adicionar novo produto'}</h2>
+        <p className="product-form-description">
+          {productToEdit
+            ? 'Altere os campos abaixo e salve para atualizar o card imediatamente.'
+            : 'Preencha os dados essenciais. O SKU será normalizado automaticamente.'}
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit} className="product-form">
         <div className="form-group">
           <label htmlFor="name">Nome:</label>
@@ -87,6 +98,7 @@ function ProductForm({ addProduct, updateProduct, productToEdit, onCancel }) {
             placeholder='Ex: Camiseta Azul'
             required
           />
+          <small className="form-helper">Use um nome fácil de encontrar na busca.</small>
         </div>
         <div className="form-group">
           <label htmlFor="price">Preço:</label>
@@ -100,6 +112,7 @@ function ProductForm({ addProduct, updateProduct, productToEdit, onCancel }) {
             min="0.01"
             required
           />
+          <small className="form-helper">Valores positivos com até 2 casas decimais.</small>
         </div>
         <div className="form-group">
           <label htmlFor="sku">SKU (3 letras):</label>
@@ -115,29 +128,32 @@ function ProductForm({ addProduct, updateProduct, productToEdit, onCancel }) {
             pattern="[A-Za-z]{3}"
             required
           />
+          <small className="form-helper">Exatamente 3 letras. Exemplo: CAM.</small>
         </div>
         {formError && (
           <p className="error-message" role="alert">
             {formError}
           </p>
         )}
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? 'Salvando...'
-            : productToEdit
-              ? 'Salvar Alterações'
-              : 'Adicionar Produto'}
-        </button>
-        {productToEdit && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="cancel-button"
-            disabled={isSubmitting}
-          >
-            Cancelar
+        <div className="form-actions">
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? 'Salvando...'
+              : productToEdit
+                ? 'Salvar Alterações'
+                : 'Adicionar Produto'}
           </button>
-        )}
+          {productToEdit && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="cancel-button"
+              disabled={isSubmitting}
+            >
+              Cancelar
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

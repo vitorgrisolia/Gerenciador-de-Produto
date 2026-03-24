@@ -3,12 +3,22 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 
 describe('App', () => {
+  const originalApiUrl = process.env.REACT_APP_API_URL;
+
+  beforeAll(() => {
+    process.env.REACT_APP_API_URL = 'http://localhost:3000';
+  });
+
   beforeEach(() => {
     global.fetch = jest.fn();
   });
 
   afterEach(() => {
     jest.resetAllMocks();
+  });
+
+  afterAll(() => {
+    process.env.REACT_APP_API_URL = originalApiUrl;
   });
 
   test('carrega e exibe os produtos retornados pela API', async () => {
