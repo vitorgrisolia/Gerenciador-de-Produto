@@ -1,123 +1,112 @@
-# Gerenciamento de Produtos - Frontend (React) e Backend (NestJS)
+# Gerenciador de Produtos
 
-Este projeto demonstra uma aplicação completa de **gerenciamento de produtos**, com um frontend desenvolvido em **React** e um backend em **NestJS**. Ele permite **criar, listar, atualizar e remover produtos**, com foco em **boas práticas de desenvolvimento** e **experiência do usuário**.
+Aplicação full stack para cadastro de produtos, com backend em NestJS e frontend em React. O sistema permite criar, listar, editar e remover produtos, mantendo os dados em SQLite e expondo um campo derivado chamado `missingLetter`, calculado a partir do nome do produto.
 
----
+## O que o projeto faz
 
-## ✨ Funcionalidades
+- Cadastra produtos com `name`, `price` e `sku`
+- Lista produtos em ordem alfabética
+- Edita e remove produtos existentes
+- Valida payloads no backend e no frontend
+- Normaliza o `sku` para exatamente 3 letras maiúsculas
+- Exibe o preço formatado em reais
+- Retorna `missingLetter` em `camelCase` na API
 
-- **Listagem de Produtos**: Exibe todos os produtos cadastrados, ordenados alfabeticamente pelo nome.
-- **Adição de Novo Produto**: Formulário para cadastrar novos produtos, incluindo nome, preço e SKU.
-- **Edição de Produto**: Modifique os dados de um produto existente.
-- **Remoção de Produto**: Exclua produtos facilmente da lista.
-- **Cálculo da "Letra Ausente"**: O backend calcula e armazena uma "letra ausente" com base no SKU.
-- **Formato de Moeda (R$)**: O preço é exibido em reais (R$), melhorando a usabilidade.
-- **Comunicação via API**: O frontend se comunica com o backend para realizar todas as operações **CRUD**.
+## Stack
 
----
+### Backend
 
-## 🛠 Tecnologias Utilizadas
+- NestJS 11
+- TypeORM
+- SQLite
+- `class-validator` + `class-transformer`
 
-### Frontend (React)
+### Frontend
 
-- **React v18+**
-- `useState`, `useEffect`
-- **Fetch API**
-- **CSS Modules** ou CSS tradicional
-- `Intl.NumberFormat` (formatação de moeda)
+- React
+- `fetch`
+- Testing Library
 
-### Backend (NestJS)
+## Estrutura
 
-- **NestJS** com **TypeScript**
-- **Express.js** (integrado ao NestJS)
-- **CORS** habilitado
-- Lógica para cálculo da **Letra Ausente**
+```text
+.
+├── src/                  # API NestJS
+├── test/                 # Testes e2e do backend
+├── produto-app/          # Aplicação React
+└── db.sqlite             # Banco SQLite local
+```
 
----
+## Variáveis de ambiente
 
-## 🚀 Como Rodar o Projeto
+Crie um arquivo `.env` na raiz com base em [.env.example](./.env.example):
 
-O projeto é dividido em duas partes: **frontend** e **backend**. Ambas devem ser executadas separadamente.
+```env
+PORT=3000
+FRONTEND_URLS=http://localhost:3001,http://127.0.0.1:3001
+DATABASE_PATH=db.sqlite
+DB_SYNCHRONIZE=true
+```
 
-### 1. Backend (NestJS)
+Crie também `produto-app/.env` com base em [produto-app/.env.example](./produto-app/.env.example):
+
+```env
+REACT_APP_API_URL=http://localhost:3000
+```
+
+## Como rodar
+
+### 1. Backend
 
 ```bash
-# Clone o repositório ou navegue até a pasta backend/
-cd seu-projeto-nestjs
-
-# Instale as dependências
 npm install
-# ou
-yarn install
-
-# Inicie o servidor
 npm run start:dev
-# ou
-yarn start:dev
 ```
 
-> O backend rodará em `http://localhost:3000`. Certifique-se de que o CORS está habilitado:
-```ts
-// main.ts
-app.enableCors();
-```
+API disponível em `http://localhost:3000`.
 
----
-
-### 2. Frontend (React)
+### 2. Frontend
 
 ```bash
-# Clone o repositório ou navegue até a pasta frontend/
-cd seu-projeto-react
-
-# Instale as dependências
+cd produto-app
 npm install
-# ou
-yarn install
-
-# Inicie a aplicação
 npm start
 ```
 
-> O React abrirá em `http://localhost:3000` ou `http://localhost:3001`, dependendo da porta disponível.
+O React tentará subir em `http://localhost:3000`; se a porta estiver ocupada pelo backend, ele pode abrir em `http://localhost:3001`.
 
----
+## Resposta da API
 
-## 🧩 Estrutura do Projeto (Frontend)
+Exemplo de produto retornado por `GET /products`:
 
-```
-produto-app/
-├── public/
-├── src/
-│   ├── App.css              # Estilos globais
-│   ├── App.js               # Componente principal
-│   ├── index.css            # Reset e base CSS
-│   ├── index.js             # Ponto de entrada
-│   ├── components/
-│   │   ├── ProductForm.css
-│   │   ├── ProductForm.js
-│   │   ├── ProductList.css
-│   │   ├── ProductList.js
-│   │   ├── ProductItem.css
-│   │   └── ProductItem.js
-│   └── ...
-└── package.json
+```json
+{
+  "id": "87a56cd1-4f8c-4cb7-b50a-5da83944cbf4",
+  "name": "Camiseta Azul",
+  "price": 49.9,
+  "sku": "CAM",
+  "missingLetter": "b"
+}
 ```
 
----
+## Regras de validação
 
-## 🤝 Contribuição
+- `name`: obrigatório
+- `price`: número maior que zero, com até 2 casas decimais
+- `sku`: obrigatório, exatamente 3 letras
 
-Contribuições são bem-vindas!  
-Sinta-se à vontade para abrir **issues** ou enviar um **pull request** com melhorias, correções ou sugestões.
+## Testes
 
----
+Backend:
 
-## 📄 Licença
+```bash
+npm test
+npm run test:e2e
+```
 
-Este projeto está licenciado sob a **MIT License** – veja o arquivo [LICENSE](LICENSE) para mais detalhes.  
-(Sinta-se livre para modificar a licença conforme necessário.)
+Frontend:
 
----
-
-> Desenvolvido com 💙 usando React e NestJS.
+```bash
+cd produto-app
+npm test -- --watchAll=false
+```

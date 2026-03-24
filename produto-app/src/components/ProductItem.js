@@ -1,25 +1,32 @@
 import React from 'react';
 import './ProductItem.css';
 
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+});
+
 function ProductItem({ product, removeProduct, onEdit }) {
-    return (
+  return (
     <li className="product-item">
-    <div>
+      <div className="product-item-content">
         <h3>{product.name}</h3>
-        <p>Preço: R$ {product.price.toFixed(2)}</p>
+        <p>Preço: {currencyFormatter.format(product.price)}</p>
         <p>SKU: {product.sku}</p>
-        <p>Letra Ausente: **{product.missingLetter || 'N/A'}**</p>
-    </div>
-    <div className="item-actions">
+        <p>
+          Letra ausente do nome: <strong>{product.missingLetter || '_'}</strong>
+        </p>
+      </div>
+      <div className="item-actions">
         <button onClick={() => onEdit(product)} className="edit-button">
-            Editar
+          Editar
         </button>
         <button onClick={() => removeProduct(product.id)} className="remove-button">
-            Remover
+          Remover
         </button>
-    </div>
+      </div>
     </li>
-);
+  );
 }
 
 export default ProductItem;

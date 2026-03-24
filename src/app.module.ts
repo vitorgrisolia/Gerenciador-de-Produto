@@ -1,15 +1,20 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
-import { Product } from './products/entities/product.entity';
+import {
+  getDatabasePath,
+  shouldSynchronizeDatabase,
+} from './config/environment';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'db.sqlite',
-      entities: [Product],
-      synchronize: true, 
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        type: 'sqlite',
+        database: getDatabasePath(),
+        autoLoadEntities: true,
+        synchronize: shouldSynchronizeDatabase(),
+      }),
     }),
     ProductsModule,
   ],

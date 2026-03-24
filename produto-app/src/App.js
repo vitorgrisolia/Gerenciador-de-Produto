@@ -4,34 +4,68 @@ import ProductForm from './components/ProductForm';
 
 import './App.css';
 
+const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:3000')
+  .replace(/\/$/, '');
+const PRODUCTS_API_URL = `${API_BASE_URL}/products`;
+
+async function getErrorMessage(response) {
+  try {
+    const errorBody = await response.json();
+
+    if (Array.isArray(errorBody.message)) {
+      return errorBody.message.join(' ');
+    }
+
+    if (typeof errorBody.message === 'string') {
+      return errorBody.message;
+    }
+  } catch {
+    return `Não foi possível concluir a requisição (${response.status}).`;
+  }
+
+  return `Não foi possível concluir a requisição (${response.status}).`;
+}
+
+async function requestJson(url, options = {}) {
+  const response = await fetch(url, options);
+
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response));
+  }
+
+  return response.json();
+}
+
 function App() {
   const [products, setProducts] = useState([]);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [feedback, setFeedback] = useState(null);
 
-  const [editingProduct, setEditingProduct] = useState(null); 
-  
-  const API_URL = 'http://localhost:3000/products'; 
-
-  // Carrega os produtos iniciais
   useEffect(() => {
     const fetchProducts = async () => {
+      setIsLoading(true);
+
       try {
-        const response = await fetch(API_URL);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await requestJson(PRODUCTS_API_URL);
         setProducts(data);
+        setFeedback(null);
       } catch (error) {
-        console.error("Erro ao buscar produtos:", error);
+        setFeedback({
+          type: 'error',
+          message: error.message || 'Erro ao buscar produtos.',
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
+
     fetchProducts();
   }, []);
 
-  // Função para adicionar um novo produto
   const addProduct = async (newProductData) => {
     try {
-      const response = await fetch(API_URL, {
+      const addedProduct = await requestJson(PRODUCTS_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,97 +73,123 @@ function App() {
         body: JSON.stringify(newProductData),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const addedProduct = await response.json();
       setProducts((prevProducts) => [...prevProducts, addedProduct]);
+      setFeedback({
+        type: 'success',
+        message: 'Produto cadastrado com sucesso.',
+      });
+      return addedProduct;
     } catch (error) {
-      console.error("Erro ao adicionar produto:", error);
+      setFeedback({
+        type: 'error',
+        message: error.message || 'Erro ao adicionar produto.',
+      });
+      throw error;
     }
   };
 
-  // Função para remover um produto
   const removeProduct = async (id) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
+      await requestJson(`${PRODUCTS_API_URL}/${id}`, {
         method: 'DELETE',
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
       setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
-      console.log(`Produto com ID ${id} removido com sucesso!`);
-      alert('Produto removido com sucesso! Atualize a Página para ver as mudanças.');
+      setEditingProduct((currentProduct) =>
+        currentProduct?.id === id ? null : currentProduct,
+      );
+      setFeedback({
+        type: 'success',
+        message: 'Produto removido com sucesso.',
+      });
     } catch (error) {
-      console.error("Erro ao remover produto:", error);
+      setFeedback({
+        type: 'error',
+        message: error.message || 'Erro ao remover produto.',
+      });
     }
   };
 
-  // Para atualizar um produto
-  const updateProduct = async (updatedProductData) => {
+  const updateProduct = async (id, updatedProductData) => {
     try {
-      const response = await fetch(`${API_URL}/${updatedProductData.id}`, {
-        method: 'PUT', // Ou 'PUT', dependendo do seu backend NestJS
+      const returnedProduct = await requestJson(`${PRODUCTS_API_URL}/${id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedProductData),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const returnedProduct = await response.json();
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           String(product.id) === String(returnedProduct.id) ? returnedProduct : product
         )
       );
       setEditingProduct(null);
-      console.log(`Produto com ID ${returnedProduct.id} atualizado com sucesso!`);
-      alert('Produto atualizado com sucesso! Atualize a Página para ver as mudanças.');
+      setFeedback({
+        type: 'success',
+        message: 'Produto atualizado com sucesso.',
+      });
+      return returnedProduct;
     } catch (error) {
-      console.error("Erro ao atualizar produto:", error);
+      setFeedback({
+        type: 'error',
+        message: error.message || 'Erro ao atualizar produto.',
+      });
+      throw error;
     }
   };
 
-  //Função para iniciar a edição de um produto
   const startEditing = (product) => {
     setEditingProduct(product);
+    setFeedback(null);
   };
 
-  // Função para cancelar a edição
   const cancelEditing = () => {
     setEditingProduct(null);
   };
 
-  // Ordena os produtos por nome
-  const sortedProducts = [...products].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedProducts = [...products].sort((a, b) =>
+    a.name.localeCompare(b.name, 'pt-BR'),
+  );
 
   return (
-    <div className="App">
-      <h1>Gerenciamento de Produtos</h1>
+    <div className="App app-shell">
+      <header className="app-header">
+        <p className="app-kicker">React + NestJS</p>
+        <h1>Gerenciamento de Produtos</h1>
+        <p className="app-subtitle">
+          Cadastro simples com validação, persistência em SQLite e API REST.
+        </p>
+      </header>
 
-      {}
+      {feedback && (
+        <p className={`app-feedback ${feedback.type}`} role="status">
+          {feedback.message}
+        </p>
+      )}
+
       {editingProduct ? (
-        <ProductForm 
+        <ProductForm
           productToEdit={editingProduct}
           updateProduct={updateProduct}
-          onCancel={cancelEditing} 
+          onCancel={cancelEditing}
         />
       ) : (
         <ProductForm addProduct={addProduct} />
       )}
-      
-      <hr />
-      <ProductList 
-        products={sortedProducts} 
-        removeProduct={removeProduct} 
-        onEdit={startEditing}
-      />
+
+      <hr className="app-divider" />
+
+      {isLoading ? (
+        <p className="app-loading">Carregando produtos...</p>
+      ) : (
+        <ProductList
+          products={sortedProducts}
+          removeProduct={removeProduct}
+          onEdit={startEditing}
+        />
+      )}
     </div>
   );
 }
