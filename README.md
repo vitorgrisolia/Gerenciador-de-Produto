@@ -1,62 +1,62 @@
-# Gerenciamento de Produtos - Frontend (React) e Backend (NestJS)
+# Product Management - Frontend (React) and Backend (NestJS)
 
-Este projeto demonstra uma aplicação completa de **gerenciamento de produtos**, com um frontend desenvolvido em **React** e um backend em **NestJS**. Ele permite **criar, listar, atualizar e remover produtos**, com foco em **boas práticas de desenvolvimento** e **experiência do usuário**.
-
----
-
-## ✨ Funcionalidades
-
-- **Listagem de Produtos**: Exibe todos os produtos cadastrados, ordenados alfabeticamente pelo nome.
-- **Adição de Novo Produto**: Formulário para cadastrar novos produtos, incluindo nome, preço e SKU.
-- **Edição de Produto**: Modifique os dados de um produto existente.
-- **Remoção de Produto**: Exclua produtos facilmente da lista.
-- **Cálculo da "Letra Ausente"**: O backend calcula e armazena uma "letra ausente" com base no SKU.
-- **Formato de Moeda (R$)**: O preço é exibido em reais (R$), melhorando a usabilidade.
-- **Comunicação via API**: O frontend se comunica com o backend para realizar todas as operações **CRUD**.
+This project demonstrates a complete **product management** application, with a frontend built in **React** and a backend in **NestJS**. It allows you to **create, list, update, and delete products**, with a focus on **development best practices** and **user experience**.
 
 ---
 
-## 🛠 Tecnologias Utilizadas
+## ✨ Features
+
+- **Product Listing**: Displays all registered products, sorted alphabetically by name.
+- **Add New Product**: Form to register new products, including name, price, and SKU.
+- **Edit Product**: Modify the data of an existing product.
+- **Delete Product**: Easily remove products from the list.
+- **"Missing Letter" Calculation**: The backend calculates and stores a "missing letter" based on the SKU.
+- **Currency Format (R$)**: The price is displayed in Brazilian Reais (R$), improving usability.
+- **API Communication**: The frontend communicates with the backend to perform all **CRUD** operations.
+
+---
+
+## 🛠 Technologies Used
 
 ### Frontend (React)
 
 - **React v18+**
 - `useState`, `useEffect`
 - **Fetch API**
-- **CSS Modules** ou CSS tradicional
-- `Intl.NumberFormat` (formatação de moeda)
+- **CSS Modules** or traditional CSS
+- `Intl.NumberFormat` (currency formatting)
 
 ### Backend (NestJS)
 
-- **NestJS** com **TypeScript**
-- **Express.js** (integrado ao NestJS)
-- **CORS** habilitado
-- Lógica para cálculo da **Letra Ausente**
+- **NestJS** with **TypeScript**
+- **Express.js** (integrated with NestJS)
+- **CORS** enabled
+- Logic for calculating the **Missing Letter**
 
 ---
 
-## 🚀 Como Rodar o Projeto
+## 🚀 How to Run the Project
 
-O projeto é dividido em duas partes: **frontend** e **backend**. Ambas devem ser executadas separadamente.
+The project is divided into two parts: **frontend** and **backend**. Both must be run separately.
 
 ### 1. Backend (NestJS)
 
 ```bash
-# Clone o repositório ou navegue até a pasta backend/
+# Clone the repository or navigate to the backend/ folder
 cd seu-projeto-nestjs
 
-# Instale as dependências
+# Install dependencies
 npm install
-# ou
+# or
 yarn install
 
-# Inicie o servidor
+# Start the server
 npm run start:dev
-# ou
+# or
 yarn start:dev
 ```
 
-> O backend rodará em `http://localhost:3000`. Certifique-se de que o CORS está habilitado:
+> The backend will run at `http://localhost:3000`. Make sure CORS is enabled:
 ```ts
 // main.ts
 app.enableCors();
@@ -67,32 +67,32 @@ app.enableCors();
 ### 2. Frontend (React)
 
 ```bash
-# Clone o repositório ou navegue até a pasta frontend/
+# Clone the repository or navigate to the frontend/ folder
 cd seu-projeto-react
 
-# Instale as dependências
+# Install dependencies
 npm install
-# ou
+# or
 yarn install
 
-# Inicie a aplicação
+# Start the application
 npm start
 ```
 
-> O React abrirá em `http://localhost:3000` ou `http://localhost:3001`, dependendo da porta disponível.
+> React will open at `http://localhost:3000` or `http://localhost:3001`, depending on the available port.
 
 ---
 
-## 🧩 Estrutura do Projeto (Frontend)
+## 🧩 Project Structure (Frontend)
 
 ```
 produto-app/
 ├── public/
 ├── src/
-│   ├── App.css              # Estilos globais
-│   ├── App.js               # Componente principal
-│   ├── index.css            # Reset e base CSS
-│   ├── index.js             # Ponto de entrada
+│   ├── App.css              # Global styles
+│   ├── App.js               # Main component
+│   ├── index.css            # CSS reset and base
+│   ├── index.js             # Entry point
 │   ├── components/
 │   │   ├── ProductForm.css
 │   │   ├── ProductForm.js
@@ -106,18 +106,18 @@ produto-app/
 
 ---
 
-## 🤝 Contribuição
+## 🤝 Contributing
 
-Contribuições são bem-vindas!  
-Sinta-se à vontade para abrir **issues** ou enviar um **pull request** com melhorias, correções ou sugestões.
-
----
-
-## 📄 Licença
-
-Este projeto está licenciado sob a **MIT License** – veja o arquivo [LICENSE](LICENSE) para mais detalhes.  
-(Sinta-se livre para modificar a licença conforme necessário.)
+Contributions are welcome!
+Feel free to open **issues** or submit a **pull request** with improvements, fixes, or suggestions.
 
 ---
 
-> Desenvolvido com 💙 usando React e NestJS.
+## 📄 License
+
+This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for more details.
+(Feel free to modify the license as needed.)
+
+---
+
+> Built with 💙 using React and NestJS.
