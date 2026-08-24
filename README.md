@@ -1,123 +1,171 @@
-# Gerenciamento de Produtos - Frontend (React) e Backend (NestJS)
+# Product Manager
 
-Este projeto demonstra uma aplicação completa de **gerenciamento de produtos**, com um frontend desenvolvido em **React** e um backend em **NestJS**. Ele permite **criar, listar, atualizar e remover produtos**, com foco em **boas práticas de desenvolvimento** e **experiência do usuário**.
+Full-stack application for registering and maintaining products, with a NestJS backend and a React frontend. The system allows creating, listing, editing, and removing products, persisting data in SQLite and returning a derived field called `missingLetter`, computed from the product's name.
 
----
+## Features
 
-## ✨ Funcionalidades
+- Product registration with `name`, `price`, and `sku`
+- Listing sorted alphabetically by name
+- Editing and removing products
+- Data validation on both frontend and backend
+- Automatic normalization of `sku` to 3 uppercase letters
+- Price formatting in Brazilian Reais (R$) on the frontend
+- Conflict handling for duplicate `sku` with a `409 Conflict` response
 
-- **Listagem de Produtos**: Exibe todos os produtos cadastrados, ordenados alfabeticamente pelo nome.
-- **Adição de Novo Produto**: Formulário para cadastrar novos produtos, incluindo nome, preço e SKU.
-- **Edição de Produto**: Modifique os dados de um produto existente.
-- **Remoção de Produto**: Exclua produtos facilmente da lista.
-- **Cálculo da "Letra Ausente"**: O backend calcula e armazena uma "letra ausente" com base no SKU.
-- **Formato de Moeda (R$)**: O preço é exibido em reais (R$), melhorando a usabilidade.
-- **Comunicação via API**: O frontend se comunica com o backend para realizar todas as operações **CRUD**.
+## Architecture
 
----
+### Backend
 
-## 🛠 Tecnologias Utilizadas
+- NestJS 11
+- TypeORM
+- SQLite
+- `class-validator`
+- `class-transformer`
 
-### Frontend (React)
+### Frontend
 
-- **React v18+**
-- `useState`, `useEffect`
-- **Fetch API**
-- **CSS Modules** ou CSS tradicional
-- `Intl.NumberFormat` (formatação de moeda)
+- React
+- `fetch`
+- Testing Library
+- Simple per-component CSS
 
-### Backend (NestJS)
+## Repository structure
 
-- **NestJS** com **TypeScript**
-- **Express.js** (integrado ao NestJS)
-- **CORS** habilitado
-- Lógica para cálculo da **Letra Ausente**
+```text
+.
+├── src/                  # NestJS API
+├── test/                 # Backend e2e tests
+├── produto-app/          # React application
+├── db.sqlite             # Local SQLite database
+└── README.md
+```
 
----
+## Environment variables
 
-## 🚀 Como Rodar o Projeto
+Create a `.env` file in the project root based on [.env.example](./.env.example):
 
-O projeto é dividido em duas partes: **frontend** e **backend**. Ambas devem ser executadas separadamente.
+```env
+PORT=3000
+FRONTEND_URLS=http://localhost:3001,http://127.0.0.1:3001
+DATABASE_PATH=db.sqlite
+DB_SYNCHRONIZE=true
+```
 
-### 1. Backend (NestJS)
+Also create `produto-app/.env` based on [produto-app/.env.example](./produto-app/.env.example):
+
+```env
+REACT_APP_API_URL=http://localhost:3000
+```
+
+## How to run
+
+### 1. Backend
+
+From the project root:
 
 ```bash
-# Clone o repositório ou navegue até a pasta backend/
-cd seu-projeto-nestjs
-
-# Instale as dependências
 npm install
-# ou
-yarn install
-
-# Inicie o servidor
 npm run start:dev
-# ou
-yarn start:dev
 ```
 
-> O backend rodará em `http://localhost:3000`. Certifique-se de que o CORS está habilitado:
-```ts
-// main.ts
-app.enableCors();
-```
+API available at `http://localhost:3000`.
 
----
+### 2. Frontend
 
-### 2. Frontend (React)
+In the `produto-app` directory:
 
 ```bash
-# Clone o repositório ou navegue até a pasta frontend/
-cd seu-projeto-react
-
-# Instale as dependências
+cd produto-app
 npm install
-# ou
-yarn install
-
-# Inicie a aplicação
 npm start
 ```
 
-> O React abrirá em `http://localhost:3000` ou `http://localhost:3001`, dependendo da porta disponível.
+If port `3000` is taken by the backend, React will usually open at `http://localhost:3001`.
 
----
+## Main endpoints
 
-## 🧩 Estrutura do Projeto (Frontend)
+### `GET /products`
 
+Lists all products sorted by name.
+
+### `GET /products/:id`
+
+Retrieves a product by `id`.
+
+### `POST /products`
+
+Creates a new product.
+
+Example payload:
+
+```json
+{
+  "name": "Camiseta Azul",
+  "price": 49.9,
+  "sku": "cam"
+}
 ```
-produto-app/
-├── public/
-├── src/
-│   ├── App.css              # Estilos globais
-│   ├── App.js               # Componente principal
-│   ├── index.css            # Reset e base CSS
-│   ├── index.js             # Ponto de entrada
-│   ├── components/
-│   │   ├── ProductForm.css
-│   │   ├── ProductForm.js
-│   │   ├── ProductList.css
-│   │   ├── ProductList.js
-│   │   ├── ProductItem.css
-│   │   └── ProductItem.js
-│   └── ...
-└── package.json
+
+Example response:
+
+```json
+{
+  "id": "87a56cd1-4f8c-4cb7-b50a-5da83944cbf4",
+  "name": "Camiseta Azul",
+  "price": 49.9,
+  "sku": "CAM",
+  "missingLetter": "b"
+}
 ```
 
----
+### `PUT /products/:id`
 
-## 🤝 Contribuição
+Updates an existing product.
 
-Contribuições são bem-vindas!  
-Sinta-se à vontade para abrir **issues** ou enviar um **pull request** com melhorias, correções ou sugestões.
+### `DELETE /products/:id`
 
----
+Removes a product.
 
-## 📄 Licença
+## Validation rules
 
-Este projeto está licenciado sob a **MIT License** – veja o arquivo [LICENSE](LICENSE) para mais detalhes.  
-(Sinta-se livre para modificar a licença conforme necessário.)
+- `name`: required
+- `price`: number greater than zero, with up to 2 decimal places
+- `sku`: required, exactly 3 letters
 
----
+## Available scripts
 
-> Desenvolvido com 💙 usando React e NestJS.
+### Backend
+
+```bash
+npm run start:dev
+npm run build
+npm run lint
+npm test
+npm run test:e2e
+```
+
+### Frontend
+
+```bash
+cd produto-app
+npm start
+npm run build
+npm test -- --watchAll=false
+```
+
+## Already validated tests
+
+The project has been validated with:
+
+- `npm run lint`
+- `npm test`
+- `npm run test:e2e`
+- `npm run build`
+- `cd produto-app && npm test -- --watchAll=false`
+- `cd produto-app && npm run build`
+
+## Notes
+
+- The `missingLetter` field is computed from the product's name and is not persisted in the database.
+- The backend uses a local SQLite database by default, ideal for development and testing.
+- The `sku` is unique in the database.
