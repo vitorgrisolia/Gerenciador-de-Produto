@@ -5,49 +5,88 @@ function ProductForm({ addProduct, updateProduct, productToEdit, onCancel }) {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [sku, setSku] = useState('');
+  const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Preenche o formulário
+  function resetForm() {
+    setName('');
+    setPrice('');
+    setSku('');
+  }
+
   useEffect(() => {
     if (productToEdit) {
       setName(productToEdit.name);
-      setPrice(productToEdit.price);
+      setPrice(String(productToEdit.price));
       setSku(productToEdit.sku);
     } else {
-      // Limpa o formulário
       setName('');
       setPrice('');
       setSku('');
     }
+
+    setFormError('');
   }, [productToEdit]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !price || !sku) {
-      alert('Por favor, preencha todos os campos.');
+    const normalizedName = name.trim();
+    const normalizedSku = sku.trim().toUpperCase();
+    const numericPrice = Number(price);
+
+    if (!normalizedName || !sku.trim() || price === '') {
+      setFormError('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    if (!/^[A-Z]{3}$/.test(normalizedSku)) {
+      setFormError('O SKU deve conter exatamente 3 letras.');
+      return;
+    }
+
+    if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+      setFormError('O preço deve ser maior que zero.');
       return;
     }
 
     const formData = {
-      name,
-      price: parseFloat(price),
-      sku: sku.toUpperCase(),
+      name: normalizedName,
+      price: numericPrice,
+      sku: normalizedSku,
     };
 
-    if (productToEdit) {
-      
-      updateProduct({ ...formData, id: productToEdit.id });
-    } else {
-      
-      addProduct(formData);
-    }
+    setIsSubmitting(true);
+    setFormError('');
 
-    
+    try {
+      if (productToEdit) {
+        await updateProduct(productToEdit.id, formData);
+      } else {
+        await addProduct(formData);
+        resetForm();
+      }
+    } catch (error) {
+      setFormError(error.message || 'Não foi possível salvar o produto.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="product-form-container">
-      <h2>{productToEdit ? 'Editar Produto' : 'Adicionar Novo Produto'}</h2>
+      <div className="product-form-heading">
+        <p className="product-form-kicker">
+          {productToEdit ? 'Modo de edição' : 'Novo cadastro'}
+        </p>
+        <h2>{productToEdit ? 'Atualize um produto' : 'Adicionar novo produto'}</h2>
+        <p className="product-form-description">
+          {productToEdit
+            ? 'Altere os campos abaixo e salve para atualizar o card imediatamente.'
+            : 'Preencha os dados essenciais. O SKU será normalizado automaticamente.'}
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit} className="product-form">
         <div className="form-group">
           <label htmlFor="name">Nome:</label>
@@ -59,6 +98,7 @@ function ProductForm({ addProduct, updateProduct, productToEdit, onCancel }) {
             placeholder='Ex: Camiseta Azul'
             required
           />
+          <small className="form-helper">Use um nome fácil de encontrar na busca.</small>
         </div>
         <div className="form-group">
           <label htmlFor="price">Preço:</label>
@@ -69,29 +109,51 @@ function ProductForm({ addProduct, updateProduct, productToEdit, onCancel }) {
             onChange={(e) => setPrice(e.target.value)}
             placeholder='Ex: 19.99'
             step="0.01"
+            min="0.01"
             required
           />
+          <small className="form-helper">Valores positivos com até 2 casas decimais.</small>
         </div>
         <div className="form-group">
-          <label htmlFor="sku">SKU (primeiras 3 letras):</label>
+          <label htmlFor="sku">SKU (3 letras):</label>
           <input
             type="text"
             id="sku"
             value={sku}
-            onChange={(e) => setSku(e.target.value)}
+            onChange={(e) =>
+              setSku(e.target.value.replace(/[^a-z]/gi, '').toUpperCase())
+            }
             placeholder='Ex: CAM'
-            maxLength="3"
+            maxLength={3}
+            pattern="[A-Za-z]{3}"
             required
           />
+          <small className="form-helper">Exatamente 3 letras. Exemplo: CAM.</small>
         </div>
-        <button type="submit">
-          {productToEdit ? 'Salvar Alterações' : 'Adicionar Produto'}
-        </button>
-        {productToEdit && ( 
-          <button type="button" onClick={onCancel} className="cancel-button">
-            Cancelar
-          </button>
+        {formError && (
+          <p className="error-message" role="alert">
+            {formError}
+          </p>
         )}
+        <div className="form-actions">
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? 'Salvando...'
+              : productToEdit
+                ? 'Salvar Alterações'
+                : 'Adicionar Produto'}
+          </button>
+          {productToEdit && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="cancel-button"
+              disabled={isSubmitting}
+            >
+              Cancelar
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );
